@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
 	socklen_t adr_sz;
 	
 	struct sockaddr_in serv_adr, from_adr;
-	if(argc!=4){
-		printf("Usage : %s <pc IP> <pc port> <robot IP>\n", argv[0]);
+	if(argc!=2){
+		printf("Usage : %s <robot port>\n", argv[0]);
 		exit(1);
 	}
 	
@@ -32,9 +32,11 @@ int main(int argc, char *argv[])
 	
 	memset(&serv_adr, 0, sizeof(serv_adr));
 	serv_adr.sin_family=AF_INET;
-	serv_adr.sin_addr.s_addr=inet_addr(argv[1]);
-	serv_adr.sin_port=htons(atoi(argv[2]));
-	
+	serv_adr.sin_port=htons(atoi(argv[1]));
+	serv_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+
+	if(bind(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr))==-1)
+		error_handling("bind() error");
 	// connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
 
 	while(1)

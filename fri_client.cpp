@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
 	int str_len;
 	socklen_t clnt_adr_sz;
 	
-	struct sockaddr_in serv_adr, clnt_adr;
-	if(argc!=2){
-		printf("Usage : %s <robot port> <robot ip>\n", argv[0]);
+	struct sockaddr_in serv_adr, clnt_adr1, clnt_adr2;
+	if(argc!=6){
+		printf("Usage : %s <pc port> <robot1 port> <robot1 ip> <robot2 port> <robot2 ip>\n", argv[0]);
 		exit(1);
 	}
 	
@@ -36,12 +36,18 @@ int main(int argc, char *argv[])
 		error_handling("bind() error");
 
 	// connect to robot client
-	clnt_adr.sin_family = AF_INET;
-	clnt_adr.sin_port = htons(atoi(argv[1]));
-	clnt_adr.sin_addr.s_addr = htonl(atoi(argv[2]))
+	clnt_adr1.sin_family = AF_INET;
+	clnt_adr1.sin_port = htons(atoi(argv[2]));
+	clnt_adr1.sin_addr.s_addr = htonl(atoi(argv[3]));
 
-	if (connect(serv_sock, (struct sockaddr *)&clnt_adr, sizeof(clnt_adr))< 0 )
-		error_handling("connect() error");
+	clnt_adr2.sin_family = AF_INET;
+	clnt_adr2.sin_port = htons(atoi(argv[4]));
+	clnt_adr2.sin_addr.s_addr = htonl(atoi(argv[5]));
+
+	if (connect(serv_sock, (struct sockaddr *)&clnt_adr1, sizeof(clnt_adr1))< 0 )
+		error_handling("connect()1 error");
+	if (connect(serv_sock, (struct sockaddr *)&clnt_adr2, sizeof(clnt_adr2))< 0 )
+		error_handling("connect()2 error");
 
 	while(1)
 	{
