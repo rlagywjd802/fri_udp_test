@@ -6,6 +6,11 @@
 #include <sys/socket.h>
 
 #define BUF_SIZE 30
+#define ROBOT1_IP 192.168.0.105
+#define ROBOT1_PORT 9000
+#define ROBOT2_IP 192.168.0.111
+#define ROBOT2_PORT 9000
+
 void error_handling(char *message);
 
 int main(int argc, char *argv[])
@@ -16,8 +21,8 @@ int main(int argc, char *argv[])
 	socklen_t adr_sz;
 	
 	struct sockaddr_in serv_adr, from_adr;
-	if(argc!=3){
-		printf("Usage : %s <IP> <port>\n", argv[0]);
+	if(argc!=4){
+		printf("Usage : %s <pc IP> <pc port> <robot IP>\n", argv[0]);
 		exit(1);
 	}
 	
@@ -30,7 +35,7 @@ int main(int argc, char *argv[])
 	serv_adr.sin_addr.s_addr=inet_addr(argv[1]);
 	serv_adr.sin_port=htons(atoi(argv[2]));
 	
-	connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
+	// connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
 
 	while(1)
 	{
