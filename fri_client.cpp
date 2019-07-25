@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	char message[BUF_SIZE];
 	int str_len;
 	socklen_t clnt_adr_sz;	
-	struct sockaddr_in pc_adr, rob_adr1, rob_adr2;
+	struct sockaddr_in pc_adr, rob1_adr, rob2_adr;
 
 	FILE *fp1, *fp2;
 	char buf1[BUF_SIZE], buf2[BUF_SIZE];
@@ -39,17 +39,17 @@ int main(int argc, char *argv[])
 		error_handling("bind() error");
 
 	// connect to robot client
-	rob_adr1.sin_family = AF_INET;
-	rob_adr1.sin_port = htons(atoi(argv[2]));
-	rob_adr1.sin_addr.s_addr = inet_addr(argv[3]);
+	rob1_adr.sin_family = AF_INET;
+	rob1_adr.sin_port = htons(atoi(argv[2]));
+	rob1_adr.sin_addr.s_addr = inet_addr(argv[3]);
 
-	rob_adr2.sin_family = AF_INET;
-	rob_adr2.sin_port = htons(atoi(argv[4]));
-	rob_adr2.sin_addr.s_addr = inet_addr(argv[5]);
+	rob2_adr.sin_family = AF_INET;
+	rob2_adr.sin_port = htons(atoi(argv[4]));
+	rob2_adr.sin_addr.s_addr = inet_addr(argv[5]);
 
-	if (connect(pc_sock, (struct sockaddr *)&rob_adr1, sizeof(rob_adr1))< 0 )
+	if (connect(pc_sock, (struct sockaddr *)&rob1_adr, sizeof(rob1_adr))< 0 )
 		error_handling("connect()1 error");
-	if (connect(pc_sock, (struct sockaddr *)&rob_adr2, sizeof(rob_adr2))< 0 )
+	if (connect(pc_sock, (struct sockaddr *)&rob2_adr, sizeof(rob2_adr))< 0 )
 		error_handling("connect()2 error");
 
 	if((fp1=fopen("text1.txt", "r"))==NULL)

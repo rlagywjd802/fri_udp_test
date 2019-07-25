@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 	while(1)
 	{
-		str_len = recvfrom(sock, messeage, BUF_SIZE, 0, (struct sockaddr *)&pc_adr, sizeof(pc_adr));
+		str_len = recvfrom(sock, message, BUF_SIZE, 0, (struct sockaddr*)&pc_adr, &adr_sz);
 		message[str_len] = 0;
 		printf("Message from server: %s", message);
 	}
