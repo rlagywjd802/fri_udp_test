@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 	memset(&pc_adr, 0, sizeof(pc_adr));
 	pc_adr.sin_family=AF_INET;
 	pc_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+	// pc_adr.sin_addr.s_addr=inet_addr("192.168.1.69");
 	pc_adr.sin_port=htons(atoi(argv[1]));
 	
 	if(bind(pc_sock, (struct sockaddr*)&pc_adr, sizeof(pc_adr))==-1)

@@ -5,6 +5,8 @@ gcc robot_controller.cpp -o robot_controller2
 # PC
 port: 9000
 ip: 192.168.0.170
+pc_to_rob1 192.168.1.65
+pc_to_rob2 192.168.1.69
 
 # Robot1
 port: 9000
