@@ -10,58 +10,72 @@ void error_handling(char *message);
 
 int main(int argc, char *argv[])
 {
-	int serv_sock;
+	int pc_sock;
 	char message[BUF_SIZE];
 	int str_len;
-	socklen_t clnt_adr_sz;
-	
-	struct sockaddr_in serv_adr, clnt_adr1, clnt_adr2;
+	socklen_t clnt_adr_sz;	
+	struct sockaddr_in pc_adr, rob_adr1, rob_adr2;
+
+	FILE *fp1, *fp2;
+	char buf1[BUF_SIZE], buf2[BUF_SIZE];
+
 	if(argc!=6){
 		printf("Usage : %s <pc port> <robot1 port> <robot1 ip> <robot2 port> <robot2 ip>\n", argv[0]);
 		exit(1);
 	}
 	
 	// socket creation
-	serv_sock=socket(PF_INET, SOCK_DGRAM, 0);
-	if(serv_sock==-1)
+	pc_sock=socket(PF_INET, SOCK_DGRAM, 0);
+	if(pc_sock==-1)
 		error_handling("UDP socket creation error");
 	
 	// assign server address
-	memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family=AF_INET;
-	serv_adr.sin_addr.s_addr=htonl(INADDR_ANY);
-	serv_adr.sin_port=htons(atoi(argv[1]));
+	memset(&pc_adr, 0, sizeof(pc_adr));
+	pc_adr.sin_family=AF_INET;
+	pc_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+	pc_adr.sin_port=htons(atoi(argv[1]));
 	
-	if(bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr))==-1)
+	if(bind(pc_sock, (struct sockaddr*)&pc_adr, sizeof(pc_adr))==-1)
 		error_handling("bind() error");
 
 	// connect to robot client
-	clnt_adr1.sin_family = AF_INET;
-	clnt_adr1.sin_port = htons(atoi(argv[2]));
-	clnt_adr1.sin_addr.s_addr = htonl(atoi(argv[3]));
+	rob_adr1.sin_family = AF_INET;
+	rob_adr1.sin_port = htons(atoi(argv[2]));
+	rob_adr1.sin_addr.s_addr = inet_addr(argv[3]);
 
-	clnt_adr2.sin_family = AF_INET;
-	clnt_adr2.sin_port = htons(atoi(argv[4]));
-	clnt_adr2.sin_addr.s_addr = htonl(atoi(argv[5]));
+	rob_adr2.sin_family = AF_INET;
+	rob_adr2.sin_port = htons(atoi(argv[4]));
+	rob_adr2.sin_addr.s_addr = inet_addr(argv[5]);
 
-	if (connect(serv_sock, (struct sockaddr *)&clnt_adr1, sizeof(clnt_adr1))< 0 )
+	if (connect(pc_sock, (struct sockaddr *)&rob_adr1, sizeof(rob_adr1))< 0 )
 		error_handling("connect()1 error");
-	if (connect(serv_sock, (struct sockaddr *)&clnt_adr2, sizeof(clnt_adr2))< 0 )
+	if (connect(pc_sock, (struct sockaddr *)&rob_adr2, sizeof(rob_adr2))< 0 )
 		error_handling("connect()2 error");
+
+	if((fp1=fopen("text1.txt", "r"))==NULL)
+		error_handling("fopen() error");
+	if((fp2=fopen("text2.txt", "r"))==NULL)
+		error_handling("fopen() error");
 
 	while(1)
 	{
-		
+		fgets(buf1, BUF_SIZE, fp1);
+		sendto(pc_sock, buf1, strlen(buf1),	0, (struct sockaddr*)&rob1_adr, sizeof(rob1_adr));
+
+		fgets(buf2, BUF_SIZE, fp2);
+		sendto(pc_sock, buf2, strlen(buf2),	0, (struct sockaddr*)&rob2_adr, sizeof(rob2_adr));
+
+		sleep(1);
 	}
 	// while(1) 
 	// {
 	// 	clnt_adr_sz=sizeof(clnt_adr);
-	// 	str_len=recvfrom(serv_sock, message, BUF_SIZE, 0, 
+	// 	str_len=recvfrom(pc_sock, message, BUF_SIZE, 0, 
 	// 							(struct sockaddr*)&clnt_adr, &clnt_adr_sz);
-	// 	sendto(serv_sock, message, str_len, 0, 
+	// 	sendto(pc_sock, message, str_len, 0, 
 	// 							(struct sockaddr*)&clnt_adr, clnt_adr_sz);
 	// }	
-	close(serv_sock);
+	close(pc_sock);
 	return 0;
 }
 

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	int str_len;
 	socklen_t adr_sz;
 	
-	struct sockaddr_in serv_adr, from_adr;
+	struct sockaddr_in rob_adr, pc_adr;
 	if(argc!=2){
 		printf("Usage : %s <robot port>\n", argv[0]);
 		exit(1);
@@ -30,18 +30,20 @@ int main(int argc, char *argv[])
 	if(sock==-1)
 		error_handling("socket() error");
 	
-	memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family=AF_INET;
-	serv_adr.sin_port=htons(atoi(argv[1]));
-	serv_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+	memset(&rob_adr, 0, sizeof(rob_adr));
+	rob_adr.sin_family=AF_INET;
+	rob_adr.sin_port=htons(atoi(argv[1]));
+	rob_adr.sin_addr.s_addr=htonl(INADDR_ANY);
 
-	if(bind(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr))==-1)
+	if(bind(sock, (struct sockaddr*)&rob_adr, sizeof(rob_adr))==-1)
 		error_handling("bind() error");
-	// connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
+	// connect(sock, (struct sockaddr*)&rob_adr, sizeof(rob_adr));
 
 	while(1)
 	{
-		
+		str_len = recvfrom(sock, messeage, BUF_SIZE, 0, (struct sockaddr *)&pc_adr, sizeof(pc_adr));
+		message[str_len] = 0;
+		printf("Message from server: %s", message);
 	}
 	// while(1)
 	// {
@@ -51,7 +53,7 @@ int main(int argc, char *argv[])
 	// 		break;
 	// 	/*
 	// 	sendto(sock, message, strlen(message), 0, 
-	// 				(struct sockaddr*)&serv_adr, sizeof(serv_adr));
+	// 				(struct sockaddr*)&rob_adr, sizeof(rob_adr));
 	// 	*/
 	// 	write(sock, message, strlen(message));
 
