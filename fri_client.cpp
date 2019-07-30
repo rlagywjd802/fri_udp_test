@@ -10,11 +10,11 @@ void error_handling(char *message);
 
 int main(int argc, char *argv[])
 {
-	int pc_sock;
+	int pc1_sock, pc2_sock;
 	char message[BUF_SIZE];
 	int str_len;
 	socklen_t clnt_adr_sz;	
-	struct sockaddr_in pc_adr, rob1_adr, rob2_adr;
+	struct sockaddr_in pc1_adr, pc2_adr, rob1_adr, rob2_adr;
 
 	FILE *fp1, *fp2;
 	char buf1[BUF_SIZE], buf2[BUF_SIZE];
@@ -25,18 +25,34 @@ int main(int argc, char *argv[])
 	}
 	
 	// socket creation
-	pc_sock=socket(PF_INET, SOCK_DGRAM, 0);
-	if(pc_sock==-1)
+	pc1_sock=socket(PF_INET, SOCK_DGRAM, 0);
+	if(pc1_sock==-1)
 		error_handling("UDP socket creation error");
 	
 	// assign server address
-	memset(&pc_adr, 0, sizeof(pc_adr));
-	pc_adr.sin_family=AF_INET;
-	pc_adr.sin_addr.s_addr=htonl(INADDR_ANY);
-	// pc_adr.sin_addr.s_addr=inet_addr("192.168.1.69");
-	pc_adr.sin_port=htons(atoi(argv[1]));
+	memset(&pc1_adr, 0, sizeof(pc1_adr));
+	pc1_adr.sin_family=AF_INET;
+	pc1_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+	pc1_adr.sin_addr.s_addr=inet_addr("192.168.1.67");
+	// pc1_adr.sin_port=htons(atoi(argv[1]));
 	
-	if(bind(pc_sock, (struct sockaddr*)&pc_adr, sizeof(pc_adr))==-1)
+	if(bind(pc1_sock, (struct sockaddr*)&pc1_adr, sizeof(pc1_adr))==-1)
+		error_handling("bind() error");
+
+
+	// socket creation
+	pc2_sock=socket(PF_INET, SOCK_DGRAM, 0);
+	if(pc2_sock==-1)
+		error_handling("UDP socket creation error");
+	
+	// assign server address
+	memset(&pc2_adr, 0, sizeof(pc2_adr));
+	pc2_adr.sin_family=AF_INET;
+	pc2_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+	pc2_adr.sin_addr.s_addr=inet_addr("192.168.2.2");
+	// pc2_adr.sin_port=htons(atoi(argv[1]));
+	
+	if(bind(pc2_sock, (struct sockaddr*)&pc2_adr, sizeof(pc2_adr))==-1)
 		error_handling("bind() error");
 
 	// connect to robot client
@@ -48,9 +64,9 @@ int main(int argc, char *argv[])
 	rob2_adr.sin_port = htons(atoi(argv[4]));
 	rob2_adr.sin_addr.s_addr = inet_addr(argv[5]);
 
-	if (connect(pc_sock, (struct sockaddr *)&rob1_adr, sizeof(rob1_adr))< 0 )
+	if (connect(pc1_sock, (struct sockaddr *)&rob1_adr, sizeof(rob1_adr))< 0 )
 		error_handling("connect()1 error");
-	if (connect(pc_sock, (struct sockaddr *)&rob2_adr, sizeof(rob2_adr))< 0 )
+	if (connect(pc2_sock, (struct sockaddr *)&rob2_adr, sizeof(rob2_adr))< 0 )
 		error_handling("connect()2 error");
 
 	if((fp1=fopen("text1.txt", "r"))==NULL)
@@ -61,10 +77,10 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 		fgets(buf1, BUF_SIZE, fp1);
-		sendto(pc_sock, buf1, strlen(buf1),	0, (struct sockaddr*)&rob1_adr, sizeof(rob1_adr));
+		sendto(pc1_sock, buf1, strlen(buf1), 0, (struct sockaddr*)&rob1_adr, sizeof(rob1_adr));
 
 		fgets(buf2, BUF_SIZE, fp2);
-		sendto(pc_sock, buf2, strlen(buf2),	0, (struct sockaddr*)&rob2_adr, sizeof(rob2_adr));
+		sendto(pc2_sock, buf2, strlen(buf2), 0, (struct sockaddr*)&rob2_adr, sizeof(rob2_adr));
 
 		sleep(1);
 	}
@@ -76,7 +92,8 @@ int main(int argc, char *argv[])
 	// 	sendto(pc_sock, message, str_len, 0, 
 	// 							(struct sockaddr*)&clnt_adr, clnt_adr_sz);
 	// }	
-	close(pc_sock);
+	close(pc1_sock);
+	close(pc2_sock);
 	return 0;
 }
 
